@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>درس تفاعلي: كيف أحببت القراءة؟</title>
+    <!-- تحميل Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- تحميل خط Cairo من Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* تطبيق الخط الافتراضي */
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        /* إخفاء العناصر بشكل افتراضي للتحكم بها عبر JS */
+        .answer-block, .vocab-definition, .tab-content, #summary-content {
+            display: none;
+        }
+        /* إظهار المحتوى الأول للتابلت بشكل افتراضي */
+        #tab-content-1 {
+            display: block;
+        }
+        /* ستايل الأزرار النشطة للتابلت */
+        .tab-btn.active {
+            background-color: #1d4ed8; /* bg-blue-700 */
+            color: white;
+        }
+        /* تحسين مظهر مشغل الصوت */
+        audio {
+            border-radius: 0.5rem; /* 8px */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* ستايل الكلمة القابلة للنقر */
+        .word {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        /* إصلاح: تم استبدال @apply بـ CSS القياسي لضمان عمله مع CDN */
+        .highlight-error {
+            background-color: #fecaca; /* ما يعادل bg-red-200 or 300 */
+            border-radius: 0.25rem;    /* ما يعادل rounded */
+            padding: 0 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- الهيدر والعنوان الرئيسي -->
+    <header class="bg-blue-800 text-white p-6 shadow-md">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold">درس تفاعلي: كيف أحببت القراءة؟</h1>
+            <p class="text-lg opacity-90">مكون الطلاقة والفهم القرائي</p>
+        </div>
+    </header>
+
+    <!-- حاوية الصفحة الرئيسية (الشريط الجانبي + المحتوى الرئيسي) -->
+    <div class="container mx-auto flex flex-col lg:flex-row-reverse gap-8 p-4 md:p-8">
+
+        <!-- الشريط الجانبي لعداد القراءة -->
+        <aside id="reading-stats-sidebar" class="w-full lg:w-64 bg-white rounded-lg shadow-lg p-4 border-r-4 border-teal-500 lg:sticky lg:top-6 lg:self-start">
+            <h3 class="text-xl font-semibold text-teal-800 mb-4 border-b pb-2">لوحة تتبع القراءة</h3>
+            
+            <!-- عداد الوقت -->
+            <div class="mb-4">
+                <label class="font-medium text-gray-700">المدة الزمنية:</label>
+                <div id="timer-display" class="text-3xl font-bold text-gray-900 text-center bg-gray-100 p-2 rounded-lg my-2">
+                    00:00
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <button id="start-btn" class="py-1 px-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">بدء</button>
+                    <button id="stop-btn" class="py-1 px-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm">إيقاف</button>
+                    <button id="reset-btn" class="py-1 px-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">إعادة</button>
+                </div>
+            </div>
+
+            <!-- عداد الأخطاء -->
+            <div class="mb-4">
+                <label for="total-error-count" class="font-medium text-gray-700">عدد الأخطاء:</label>
+                <div id="total-error-count" class="text-3xl font-bold text-red-600 text-center bg-gray-100 p-2 rounded-lg my-2">
+                    0
+                </div>
+            </div>
+
+            <!-- عدد كلمات الفقرة -->
+            <div>
+                <label for="paragraph-word-count" class="font-medium text-gray-700">كلمات الفقرة الحالية:</label>
+                <div id="paragraph-word-count" class="text-xl font-bold text-blue-600 text-center bg-gray-100 p-2 rounded-lg my-2">
+                    -
+                </div>
+            </div>
+            
+            <p class="text-xs text-gray-500 mt-4 italic">انقر نقراً مزدوجاً على الكلمة في النص لتسجيلها كخطأ.</p>
+        </aside>
+
+        <!-- المحتوى الرئيسي للدرس -->
+        <main class="flex-1">
+
+            <!-- 1. مرحلة الانطلاق (من البطاقة التقنية) -->
+            <section id="opening" class="bg-white rounded-lg shadow-lg p-6 mb-8 border-r-4 border-blue-500">
+                <h2 class="text-2xl font-semibold text-blue-800 mb-4">1. مرحلة الانطلاق: تهيئة واستكشاف</h2>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                    <h3 class="text-lg font-semibold mb-2">نشاط لكسر الجليد:</h3>
+                    <p class="text-gray-700">شاركنا تجربتك: ما هو آخر كتاب قرأته وأعجبك؟ أو ما هي هوايتك المفضلة؟</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">أهداف الحصة:</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                        <li>قراءة النص قراءة سليمة ومعبرة (طلاقة).</li>
+                        <li>اكتساب رصيد معجمي جديد مرتبط بمجال القراءة.</li>
+                        <li>فهم مضامين النص بشكل مباشر واستخراج معلومات صريحة منه.</li>
+                        <li>تحديد عناصر الوضعية التواصلية للنص.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 2. اكتساب المعجم (من الكتاب) -->
+            <section id="vocabulary" class="bg-white rounded-lg shadow-lg p-6 mb-8 border-r-4 border-green-500">
+                <h2 class="text-2xl font-semibold text-green-800 mb-4">2. اكتساب المعجم: شروحات مساعدة</h2>
+                <p class="text-gray-600 mb-4">اضغط على الكلمة لاكتشاف معناها:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="vocab-card bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow">
+                        <h4 class="text-xl font-bold text-green-700">شارَفَ الثَّمَانِينَ</h4>
+                        <p class="vocab-definition text-gray-700 mt-2">اقْتَرَبَ مِنَ السَّنَةِ الثَّمَانِينَ مِنْ عُمْرِهِ.</p>
+                    </div>
+                    <div class="vocab-card bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow">
+                        <h4 class="text-xl font-bold text-green-700">مُلهمتي</h4>
+                        <p class="vocab-definition text-gray-700 mt-2">الَّتِي مَنَحَتْنِي الْإِلْهَامَ وَالْأَفْكَارَ وَالْعَزِيمَةَ.</p>
+                    </div>
+                    <div class="vocab-card bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow">
+                        <h4 class="text-xl font-bold text-green-700">الخافت</h4>
+                        <p class="vocab-definition text-gray-700 mt-2">الْخَفِيفُ وَالضَّعِيفُ وَالْوَاهِنُ.</p>
+                    </div>
+                    <div class="vocab-card bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow">
+                        <h4 class="text-xl font-bold text-green-700">أَثِير</h4>
+                        <p class="vocab-definition text-gray-700 mt-2">مُفَضَّل.</p>
+                    </div>
+                    <div class="vocab-card bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow">
+                        <h4 class="text-xl font-bold text-green-700">الوَلَعُ</h4>
+                        <p class="vocab-definition text-gray-700 mt-2">الْحُبُّ وَالشَّغَفُ.</p>
+                    </div>
+                    <div class="vocab-card bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow">
+                        <h4 class="text-xl font-bold text-green-700">كُنْهَهُ</h4>
+                        <p class="vocab-definition text-gray-700 mt-2">حَقِيقَتَهُ وَجَوْهَرَهُ.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. قراءة النص (من الكتاب) -->
+            <section id="reading" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">3. النص: كَيْفَ أَحْبَبْتُ الْقِرَاءةَ؟</h2>
+                <div class="bg-yellow-100 border-r-4 border-yellow-500 text-yellow-800 p-4 rounded-lg mb-6">
+                    <h3 class="font-bold">النشاط 1: قراءة صامتة</h3>
+                    <p>خذ دقيقتين لقراءة النص قراءة صامتة متأنية. ضع خطاً تحت الكلمات التي لم تفهمها (كما في كتابك).</p>
+                </div>
+
+                <div class="prose prose-lg max-w-none text-gray-700 leading-loose bg-gray-50 p-6 rounded-lg border">
+                    <p>كانَ أَبي وَأُمِّي قارِئَيْنِ. لَمْ يَكُنْ أَبِي يَكُفَّ عَنِ الْقِرَاءَةِ كُلَّ يَوْمٍ وَإِلَى يَوْمِنَا هَذَا، وَهُوَ الَّذِي شَارَفَ الثَّمَانِينَ. وَأَمَّا أُمِّي الَّتِي لَمْ تُتْمِمْ دِرَاسَتَها، فَقَدْ كَانَتْ مُلْهِمَتِي في هَذا السَّبِيلِ. لَمْ يَكُنْ عُمْرِي يَتَجاوَزُ أَرْبَعَ سِنِينَ حِينَ كُنتُ أُشَاهِدُها في بَيْتِ جَدِّي فِي غُرْفَةٍ طِينِيَّةِ ذاتِ نورٍ خافت بمصباح واهِنِ، تُمْسِكُ بِكِتَابِ بَيْنَ يَدَيْهَا وَتَحْنو عَلَيْهِ كَأَنَّهُ أَحَدُ أَبْنَائِهَا، وَيَسْقُطُ ضَوْءُ الْمِصْبَاحِ الْخَافِتُ عَلَى وَجْهِهَا وَالظُّلالُ عَلَى الْكِتَابِ، وَيَبْدُو مِنْ هَيْئَةِ انْحِنَاءَتِهَا الْخَفِيفَةِ عَلَيْهِ أَنَّهُ أَثِيرٌ عِنْدَهَا إِلَى حَدِّ كَبِيرٍ.</p>
+                    <p>انْتَقَلَ إِلَيَّ هَذَا الْوَلَعُ دُونَ أَنْ تُعَلِّمَنِي أُمِّي إِيَّاهُ. أَحْبَبْتُ بِفَضْلِهَا الْقِرَاءَةَ، وَأَنَا بَعْدُ لَمْ أَدْخُلِ الْمَدْرَسَةَ. وَبَعْدَ أَنْ كَبِرْتُ صِرْنَا نَقْرَأُ مَعَا الْكُتُبَ نَفْسَهَا وَالْحِكَايَاتِ نَفْسَها، فَكُنَّا نَتَبَادَلُ ما نَقْرَأُ وَنُنَاقِشُهُ. كَانَتْ تُناقِشُنِي وَهِيَ تَضْحَكُ مَعي كَصَدِيقِ، فَزَادَ ذَلِكَ مِنْ حُبِّي لِلْقِرَاءَةِ.</p>
+                    <p>صِرْتُ في خيالي، بِفَضْلِ مَا قَرَأْتُهُ أَنَا وَأُمِّي، أُؤَلِّفُ الْحِكاياتِ، وَهِيَ تَسْتَمِعُ إِلَيْهَا وَتَضْحَكُ، وَأَحْيَانَا تَظَلُّ صَامِتَةً، فَأَسْأَلُهَا: "أَلَمْ تُعْجِبْكِ الْحِكَايَةُ؟" فَتَهُزُّ رَأْسَها، وَأُعِيدُ تَرْتِيبَ الْأَحْداثِ الْأَخِيرَةِ لِتَحْصُلَ أُمِّي عَلَى نِهَايَةٍ مُخْتَلِفةٍ، حِينَها فَقَطْ تَضْحَكُ، وَحِينَهَا فَقَطْ أَسْتَمِرُّ فِي اللَّعْبَةِ!.</p>
+                    <p>لا أَدْرِي إِنْ تَدَخَلَ أَبِي بِشَكْلٍ مَقْصُودٍ أَمْ لَا، لَكِنَّهُ - بالتأكيد - كان يرى أَنَّني وَأَنَا فِي الصَّفُ الثَّانِي الِابْتِدَائِي قَدْ كَبُرْتُ عَلَى هَذِهِ الْقِرَاءَةِ، فَأَخَذَنِي إِلَى الْمَكْتَبَاتِ الْكُبْرَى.</p>
+                    <p>بَدَأْتُ آكُلُ مَا أَقْرَأُ عَلَى الْحَقِيقَةِ الْتِهامُ مَعَ شَغَفٍ مَعَ احتراق داخلي لا أَدْرِي كُنْهَهُ. صَارَ الْهُرُوبُ إِلَى الْكِتَابِ مُتْعَتِي السِّرِّيَّةَ، وَلَمْ يَكُنْ هُناكَ مَا يُلْهِينِي عَنْهُ سوى dَرَاجَتِي وَاللَّعِبِ مَعَ أَطْفَالِ الْقَرْيَةِ أَحْيَانًا. لَمْ تَكُنْ هُناكَ هَواتِفُ ذَكِيَّةٌ وَلا غَيْرُ ذَكِيَّةٍ، وَلَمْ تَكُنْ هُناك شاشات تَلْفَزِيَّةٌ، كَانَتْ شَاشَتُنَا الْوَحِيدَةُ هِيَ صَفْحَةَ السَّمَاءِ، وَكَانَ حِرْمَانُنَا مِنْ هَذِهِ الْأَجْهِزَةِ أَكْبَرَ نِعَمِ اللَّهِ عَلَى جِيلِنا!</p>
+                    <footer class="text-sm text-gray-500 italic mt-4">
+                        أيمن العتوم، "هذه سبيلي: تجربتي في الحياة والكتابة" (بتصرف)
+                    </footer>
+                </div>
+
+                <div class="mt-8 mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">القراءة النموذجية (استماع)</h3>
+                    <div class="space-y-4 max-w-lg mx-auto">
+                        <div>
+                            <p class="font-medium text-gray-700 mb-2">النموذج 1:</p>
+                            <audio controls class="w-full">
+                                <source src="https://l.top4top.io/m_3591amn271.mp3" type="audio/mpeg">
+                                متصفحك لا يدعم عنصر الصوت.
+                            </audio>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-700 mb-2">النموذج 2:</p>
+                            <audio controls class="w-full">
+                                <!-- إصلاح: تم تصحيح رابط المصدر هنا -->
+                                <source src="https://a.top4top.io/m_3591mc62n2.mp3" type="audio/mpeg">
+                                متصفحك لا يدعم عنصر الصوت.
+                            </audio>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. تدريبات الطلاقة (من الكتاب) -->
+            <section id="fluency-practice" class="bg-white rounded-lg shadow-lg p-6 mb-8 border-r-4 border-purple-500">
+                <h2 class="text-2xl font-semibold text-purple-800 mb-4">4. النشاط 2: التدرب على الطلاقة</h2>
+                <div class="flex border-b border-gray-300 mb-4">
+                    <button class="tab-btn active py-2 px-6 bg-gray-200 rounded-t-lg focus:outline-none" data-target="tab-content-1">تدريب الكلمات</button>
+                    <button class="tab-btn py-2 px-6 bg-gray-200 rounded-t-lg focus:outline-none" data-target="tab-content-2">تدريب العبارات</button>
+                    <button class="tab-btn py-2 px-6 bg-gray-200 rounded-t-lg focus:outline-none" data-target="tab-content-3">تدريب الفقرة</button>
+                </div>
+                <div id="tab-content-1" class="tab-content p-4">
+                    <h3 class="text-xl font-semibold mb-3">أَتَمَرَّنُ عَلَى قِرَاءَةِ الْكَلِمَاتِ بِطَلَاقَةٍ:</h3>
+                    <div class="flex flex-wrap gap-4 text-lg">
+                        <span class="bg-purple-100 text-purple-800 py-2 px-4 rounded-full font-medium">يَكُفَّ</span>
+                        <span class="bg-purple-100 text-purple-800 py-2 px-4 rounded-full font-medium">تَحْنُو</span>
+                        <span class="bg-purple-100 text-purple-800 py-2 px-4 rounded-full font-medium">أَخَذَنِي</span>
+                        <span class="bg-purple-100 text-purple-800 py-2 px-4 rounded-full font-medium">الظِّلالُ</span>
+                        <span class="bg-purple-100 text-purple-800 py-2 px-4 rounded-full font-medium">أُؤَلِّفُ</span>
+                        <span class="bg-purple-100 text-purple-800 py-2 px-4 rounded-full font-medium">لَمْ تُتْمِمْ</span>
+                    </div>
+                </div>
+                <div id="tab-content-2" class="tab-content p-4">
+                    <h3 class="text-xl font-semibold mb-3">أَتَمَرَّنُ عَلَى قِرَاءَةِ الْعِبَارَاتِ بِطَلَاقَةٍ:</h3>
+                    <ul class="list-disc list-inside space-y-3 text-lg">
+                        <li>وَأَمَّا أُمِّي الَّتِي لَمْ تُتْمِمْ دِرَاسَتَها، فَقَدْ كَانَتْ مُلْهِمَتِي فِي هَذا السَّبِILِ.</li>
+                        <li>صِرْتُ في خيالي، بِفَضْلِ مَا قَرَأْتُهُ أَنَا وَأُمِّي، أُؤَلِّفُ الْحِكاياتِ، وَهِيَ تَسْتَمِعُ إِلَيْهَا وَتَضْحَكُ.</li>
+                    </ul>
+                </div>
+                <div id="tab-content-3" class="tab-content p-4">
+                    <h3 class="text-xl font-semibold mb-3">أَتَمَرَّنُ عَلَى قِرَاءَةِ فِقْرَةٍ:</h3>
+                    <p class="text-lg leading-relaxed bg-gray-50 p-4 rounded-lg border">
+                        "بَدَأْتُ آكُلُ مَا أَقْرَأُ عَلَى الْحَقِيقَةِ الْتِهامُ مَعَ شَغَفٍ مَعَ احتراق داخلي لا أَدْرِي كُنْهَهُ. صَارَ الْهُرُوبُ إِلَى الْكِتَابِ مُتْعَتِي السِّرِّيَّةَ، وَلَمْ يَكُنْ هُناكَ مَا يُلْهِينِي عَنْهُ سوى دَرَاجَتِي وَاللَّعِبِ مَعَ أَطْفَالِ الْقَرْيَةِ أَحْيَانًا..."
+                    </p>
+                </div>
+            </section>
+
+            <!-- 5. الفهم المباشر (من الكتاب) -->
+            <section id="comprehension" class="bg-white rounded-lg shadow-lg p-6 mb-8 border-r-4 border-red-500">
+                <h2 class="text-2xl font-semibold text-red-800 mb-4">5. النشاط 3: الفهم المباشر</h2>
+                <div class="comprehension-activity mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <h3 class="text-xl font-semibold mb-3">أ) أُنْجِزُ بِطَاقَةَ تَعْرِيفِ لِلنَّص:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="font-medium">العنوان:</label> <input type="text" class="w-full p-2 border rounded-lg mt-1" placeholder="اكتب هنا..."></div>
+                        <div><label class="font-medium">الكاتب:</label> <input type="text" class="w-full p-2 border rounded-lg mt-1" placeholder="اكتب هنا..."></div>
+                        <div><label class="font-medium">المصدر:</label> <input type="text" class="w-full p-2 border rounded-lg mt-1" placeholder="اكتب هنا..."></div>
+                    </div>
+                    <button class="reveal-answer-btn mt-3 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">أظهر الأجوبة</button>
+                    <div class="answer-block mt-3 p-3 bg-red-100 text-red-800 rounded-lg">
+                        <p><strong>العنوان:</strong> كيف أحببت القراءة؟</p>
+                        <p><strong>الكاتب:</strong> أيمن العتوم</p>
+                        <p><strong>المصدر:</strong> هذه سبيلي: تجربتي في الحياة والكتابة</p>
+                    </div>
+                </div>
+                <div class="comprehension-activity mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <h3 class="text-xl font-semibold mb-3">ب) أُحَدِّدُ الْوَضْعِيَّةَ التَّوَاصُلِيَّةَ:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="font-medium">من المتحدث؟</label> <input type="text" class="w-full p-2 border rounded-lg mt-1" placeholder="اكتب هنا..."></div>
+                        <div><label class="font-medium">عمن يتحدث؟</label> <input type="text" class="w-full p-2 border rounded-lg mt-1" placeholder="اكتب هنا..."></div>
+                        <div><label class="font-medium">من المخاطب؟</label> <input type="text" class="w-full p-2 border rounded-lg mt-1" placeholder="اكتب هنا..."></div>
+                        <div><label class="font-medium">ما الغاية من الخطاب؟</label> <input type="text" class="w-full p-2 border rounded-lg mt-1" placeholder="اكتب هنا..."></div>
+                    </div>
+                    <button class="reveal-answer-btn mt-3 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">أظهر الأجوبة</button>
+                    <div class="answer-block mt-3 p-3 bg-red-100 text-red-800 rounded-lg">
+                        <p><strong>المتحدث:</strong> الكاتب أيمن العتوم.</p>
+                        <p><strong>عمن يتحدث؟:</strong> عن تجربته الشخصية وكيف أحب القراءة بتأثير من والديه.</p>
+                        <p><strong>المخاطب:</strong> القارئ (نحن).</p>
+                        <p><strong>الغاية:</strong> الإخبار والسرد ومشاركة تجربة ملهمة.</p>
+                    </div>
+                </div>
+                <div class="comprehension-activity mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <h3 class="text-xl font-semibold mb-3">ج) أُعِيدُ تَرْتِيبَ الْأَحْدَاثِ (من 1 إلى 3):</h3>
+                    <div class="space-y-3" id="event-ordering">
+                        <div class="flex items-center gap-3 p-2 rounded-lg transition-all">
+                            <input type="number" min="1" max="3" class="w-16 p-2 border rounded-lg text-center font-bold text-lg" data-correct="3">
+                            <p>ازديادُ شَغَفِ الطِّفْلِ بِقِرَاءَةِ الْكُتُبِ فِي غِيَابِ الْأَجْهِرَةِ الْإِلِكْتُرُونِيَّةِ.</p>
+                        </div>
+                        <div class="flex items-center gap-3 p-2 rounded-lg transition-all">
+                            <input type="number" min="1" max="3" class="w-16 p-2 border rounded-lg text-center font-bold text-lg" data-correct="1">
+                            <p>تأثرُ الطِّفْلِ بِأُمِّهِ الَّتِي أَلْهَمَتْهُ حُبَّ الْقِرَاءَةِ.</p>
+                        </div>
+                        <div class="flex items-center gap-3 p-2 rounded-lg transition-all">
+                            <input type="number" min="1" max="3" class="w-16 p-2 border rounded-lg text-center font-bold text-lg" data-correct="2">
+                            <p>اصْطِحَابُ الْأَبِ ابْنَهُ إِلَى الْمَكْتَبَاتِ الْكُبْرَى.</p>
+                        </div>
+                    </div>
+                    <button id="check-order-btn" class="mt-3 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">تحقق من الترتيب</button>
+                    <p id="order-feedback" class="answer-block mt-3 p-3 rounded-lg font-bold"></p>
+                </div>
+            </section>
+
+            <!-- 6. مرحلة الختام (من البطاقة التقنية) -->
+            <section id="closing" class="bg-white rounded-lg shadow-lg p-6 border-r-4 border-blue-500">
+                <h2 class="text-2xl font-semibold text-blue-800 mb-4">6. مرحلة الختام: حصيلة وتعزيز</h2>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                    <h3 id="summary-toggle" class="text-lg font-semibold mb-2 cursor-pointer flex justify-between items-center">
+                        <span>حصيلة ما تعلمناه اليوم</span>
+                        <span class="text-blue-500 text-2xl font-bold">+</span>
+                    </h3>
+                    <div id="summary-content" class="text-gray-700 mt-2 space-y-1">
+                        <p>✓ قرأنا نصاً عن أهمية القدوة (الأم والأب) في حب القراءة.</p>
+                        <p>✓ تدربنا على قراءة كلمات وعبارات بطلاقة.</p>
+                        <p>✓ اكتشفنا معاني مفردات جديدة (ولع، أثير، كنهه...).</p>
+                        <p>✓ استخرجنا معلومات صريحة من النص (بطاقة التعريف، ترتيب الأحداث...).</p>
+                      
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">الواجب المنزلي:</h3>
+                    <div class="bg-blue-100 text-blue-800 p-4 rounded-lg border border-blue-200">
+                        <p class="font-medium">اكتب فقرة قصيرة (لا تتجاوز 5 أسطر) تصف فيها كيف يمكن أن تصبح القراءة هوايتك المفضلة، مستفيداً من تجربة الكاتب.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="text-center p-6 text-gray-500 text-sm mt-8">
+        تم إنشاء هذا المحتوى التفاعلي بناءً على الملفات المرفقة.
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // --- عداد القراءة ---
+            let timerInterval = null;
+            let totalSeconds = 0;
+            const timerDisplay = document.getElementById('timer-display');
+            const errorCountDisplay = document.getElementById('total-error-count');
+            const paragraphWordCountDisplay = document.getElementById('paragraph-word-count');
+            const textContainer = document.querySelector('#reading .prose');
+
+            function prepareText() {
+                const paragraphs = textContainer.querySelectorAll('p');
+                paragraphs.forEach(p => {
+                    if (p.children.length > 0) return; 
+                    const text = p.textContent.trim();
+                    const words = text.split(/\s+/);
+                    p.dataset.wordCount = words.length;
+                    p.innerHTML = words.map(word => `<span class="word">${word}</span>`).join(' ');
+                });
+            }
+            prepareText();
+
+            document.getElementById('reading-stats-sidebar').addEventListener('click', function(e) {
+                if (e.target.id === 'start-btn') startTimer();
+                if (e.target.id === 'stop-btn') stopTimer();
+                if (e.target.id === 'reset-btn') resetAll();
+            });
+
+            textContainer.addEventListener('dblclick', function(e) {
+                if (e.target.classList.contains('word') && !e.target.classList.contains('highlight-error')) {
+                    const wordSpan = e.target;
+                    wordSpan.classList.add('highlight-error');
+                    
+                    const currentErrors = document.querySelectorAll('.highlight-error').length;
+                    errorCountDisplay.textContent = currentErrors;
+                    
+                    const paragraph = wordSpan.closest('p');
+                    if (paragraph && paragraph.dataset.wordCount) {
+                        paragraphWordCountDisplay.textContent = paragraph.dataset.wordCount;
+                    }
+                }
+            });
+
+            function startTimer() {
+                if (timerInterval) return;
+                timerInterval = setInterval(() => {
+                    totalSeconds++;
+                    timerDisplay.textContent = formatTime(totalSeconds);
+                }, 1000);
+            }
+
+            function stopTimer() {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            function resetAll() {
+                stopTimer();
+                totalSeconds = 0;
+                timerDisplay.textContent = '00:00';
+                errorCountDisplay.textContent = '0';
+                paragraphWordCountDisplay.textContent = '-';
+                const highlightedWords = document.querySelectorAll('.highlight-error');
+                highlightedWords.forEach(word => word.classList.remove('highlight-error'));
+            }
+
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+
+            // --- تفاعلية باقي الصفحة ---
+
+            const vocabCards = document.querySelectorAll('.vocab-card');
+            vocabCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const definition = card.querySelector('.vocab-definition');
+                    definition.style.display = definition.style.display === 'block' ? 'none' : 'block';
+                });
+            });
+
+            const revealButtons = document.querySelectorAll('.reveal-answer-btn');
+            revealButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const answerBlock = button.nextElementSibling;
+                    answerBlock.style.display = answerBlock.style.display === 'block' ? 'none' : 'block';
+                });
+            });
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    tabContents.forEach(content => content.style.display = 'none');
+                    const targetId = button.getAttribute('data-target');
+                    document.getElementById(targetId).style.display = 'block';
+                });
+            });
+
+            const checkOrderBtn = document.getElementById('check-order-btn');
+            const orderFeedback = document.getElementById('order-feedback');
+            checkOrderBtn.addEventListener('click', () => {
+                const inputs = document.querySelectorAll('#event-ordering input');
+                let allCorrect = true;
+                inputs.forEach(input => {
+                    if (input.value !== input.getAttribute('data-correct')) {
+                        allCorrect = false;
+                        input.classList.add('border-red-500', 'bg-red-100');
+                        input.classList.remove('border-green-500', 'bg-green-100');
+                    } else {
+                        input.classList.add('border-green-500', 'bg-green-100');
+                        input.classList.remove('border-red-500', 'bg-red-100');
+                    }
+                });
+                
+                orderFeedback.textContent = allCorrect ? 'ممتاز! الترتيب صحيح.' : 'حاول مرة أخرى. الترتيب الصحيح هو: 3، 1، 2';
+                orderFeedback.style.display = 'block';
+                orderFeedback.className = 'answer-block mt-3 p-3 rounded-lg font-bold ' + (allCorrect 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800');
+            });
+
+            const summaryToggle = document.getElementById('summary-toggle');
+            const summaryContent = document.getElementById('summary-content');
+            summaryToggle.addEventListener('click', () => {
+                const isHidden = summaryContent.style.display === 'none' || summaryContent.style.display === '';
+                summaryContent.style.display = isHidden ? 'block' : 'none';
+                summaryToggle.querySelector('span:last-child').textContent = isHidden ? '−' : '+';
+            });
+        });
+    </script>
+</body>
+</html>
